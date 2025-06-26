@@ -1,0 +1,116 @@
+// ➤ WorkFixtures
+
+const mongoose = require('mongoose');
+const Category = require('../models/Category');
+
+async function getWorks() {
+  //await mongoose.connect('mongodb://localhost:27017/tonDB'); // adapte à ta config
+
+  const categories = await Category.find();
+
+  if (categories.length === 0) {
+    console.error('Aucune catégorie trouvée. Veuillez d’abord insérer les catégories.');
+    return;
+  }
+
+  const works = [
+    { id: 1, name: 'Rodage des soupapes', subcategory: 'Réparations sur le haut moteur', category: categories[0]._id },
+    { id: 2, name: 'Remplacement des soupapes (admission / échappement)', subcategory: 'Réparations sur le haut moteur', category: categories[0]._id },
+    { id: 3, name: 'Remplacement des joints de queue de soupapes', subcategory: 'Réparations sur le haut moteur', category: categories[0]._id },
+    { id: 4, name: 'Remplacement du joint de culasse', subcategory: 'Réparations sur le haut moteur', category: categories[0]._id },
+    { id: 5, name: 'Surfaçage de la culasse', subcategory: 'Réparations sur le haut moteur', category: categories[0]._id },
+    { id: 6, name: 'Réglage du jeu aux soupapes', subcategory: 'Réparations sur le haut moteur', category: categories[0]._id },
+    { id: 7, name: 'Remplacement de l’arbre à cames', subcategory: 'Réparations sur le haut moteur', category: categories[0]._id },
+    { id: 8, name: 'Réglage ou remplacement des linguets / culbuteurs', subcategory: 'Réparations sur le haut moteur', category: categories[0]._id },
+    { id: 9, name: 'Remplacement des segments de piston', subcategory: 'Réparations sur le bas moteur', category: categories[0]._id },
+    { id: 10, name: 'Remplacement des pistons', subcategory: 'Réparations sur le bas moteur', category: categories[0]._id },
+    { id: 11, name: 'Remplacement des coussinets de bielle', subcategory: 'Réparations sur le bas moteur', category: categories[0]._id },
+    { id: 12, name: 'Remplacement du vilebrequin', subcategory: 'Réparations sur le bas moteur', category: categories[0]._id },
+    { id: 13, name: 'Rectification du vilebrequin', subcategory: 'Réparations sur le bas moteur', category: categories[0]._id },
+    { id: 14, name: 'Remplacement des bielles', subcategory: 'Réparations sur le bas moteur', category: categories[0]._id },
+    { id: 15, name: 'Remplacement du volant moteur', subcategory: 'Réparations sur le bas moteur', category: categories[1]._id },
+    { id: 16, name: 'Démontage complet et remontage du moteur', subcategory: 'Réparations diverses du bloc moteur', category: categories[0]._id },
+    { id: 17, name: 'Démontage complet et remontage du moteur', subcategory: 'Réparations diverses du bloc moteur', category: categories[0]._id },
+    { id: 18, name: 'Nettoyage du bloc moteur', subcategory: 'Réparations diverses du bloc moteur', category: categories[1]._id },
+    { id: 19, name: 'Épreuve du bloc / détection de fissures', subcategory: 'Réparations diverses du bloc moteur', category: categories[0]._id },
+    { id: 20, name: 'Réalésage des cylindres', subcategory: 'Réparations diverses du bloc moteur', category: categories[0]._id },
+    { id: 21, name: 'Remplacement du bloc moteur', subcategory: 'Réparations diverses du bloc moteur', category: categories[0]._id },
+    { id: 22, name: 'Remplacement de la courroie ou chaîne de distribution', subcategory: 'Réparations du système de distribution', category: categories[0]._id },
+    { id: 23, name: 'Remplacement des galets tendeurs', subcategory: 'Réparations du système de distribution', category: categories[0]._id },
+    { id: 24, name: 'Calage de la distribution', subcategory: 'Réparations du système de distribution', category: categories[0]._id },
+    { id: 25, name: 'Remplacement de la pompe à eau', subcategory: 'Réparations du système de refroidissement', category: categories[0]._id },
+    { id: 26, name: 'Remplacement du thermostat', subcategory: 'Réparations du système de refroidissement', category: categories[0]._id },
+    { id: 27, name: 'Nettoyage ou remplacement du radiateur', subcategory: 'Réparations du système de refroidissement', category: categories[0]._id },
+    { id: 28, name: 'Purge du liquide de refroidissement', subcategory: 'Réparations du système de refroidissement', category: categories[0]._id },
+    { id: 29, name: 'Nettoyage ou remplacement des injecteurs', subcategory: 'Réparations du système d’alimentation', category: categories[13]._id },
+    { id: 30, name: 'Révision de la pompe à injection', subcategory: 'Réparations du système d’alimentation', category: categories[13]._id },
+    { id: 31, name: 'Nettoyage du carburateur (anciens moteurs)', subcategory: 'Réparations du système d’alimentation', category: categories[13]._id },
+    { id: 32, name: 'Contrôle ou remplacement du filtre à carburant', subcategory: 'Réparations du système d’alimentation', category: categories[13]._id },
+    { id: 33, name: 'Remplacement du collecteur d’échappement', subcategory: 'Réparations du système d’échappement', category: categories[0]._id },
+    { id: 34, name: 'Remplacement du joint de collecteur', subcategory: 'Réparations du système d’échappement', category: categories[0]._id },
+    { id: 35, name: 'Remplacement du catalyseur / FAP', subcategory: 'Réparations du système d’échappement', category: categories[0]._id },
+    { id: 36, name: 'Contrôle et remplacement de la sonde lambda', subcategory: 'Réparations du système d’échappement', category: categories[2]._id },
+    { id: 37, name: 'Remplacement d’amortisseurs', subcategory: 'Suspension', category: categories[8]._id },
+    { id: 38, name: 'Remplacement de ressorts de suspension', subcategory: 'Suspension', category: categories[8]._id },
+    { id: 39, name: 'Remplacement de coupelles d’amortisseur', subcategory: 'Suspension', category: categories[8]._id },
+    { id: 40, name: 'Contrôle et remplacement de silentblocs', subcategory: 'Suspension', category: categories[8]._id },
+    { id: 41, name: 'Remplacement de bras de suspension', subcategory: 'Suspension', category: categories[8]._id },
+    { id: 42, name: 'Remplacement de rotules de suspension', subcategory: 'Suspension', category: categories[8]._id },
+    { id: 43, name: 'Réglage de la géométrie (parallélisme)', subcategory: 'Suspension', category: categories[8]._id },
+    { id: 44, name: 'Remplacement de biellettes de direction', subcategory: 'Direction', category: categories[8]._id },
+    { id: 45, name: 'Remplacement de rotules axiales', subcategory: 'Direction', category: categories[8]._id },
+    { id: 46, name: 'Remplacement de la crémaillère de direction', subcategory: 'Direction', category: categories[8]._id },
+    { id: 47, name: 'Contrôle et purge du liquide de direction assistée', subcategory: 'Direction', category: categories[8]._id },
+    { id: 48, name: 'Remplacement de colonne de direction', subcategory: 'Direction', category: categories[8]._id },
+    { id: 49, name: 'Contrôle et remplacement du volant moteur', subcategory: 'Direction', category: categories[8]._id },
+    { id: 50, name: 'Remplacement de pneus', subcategory: 'Roues et pneus', category: categories[0]._id },
+    { id: 51, name: 'Équilibrage des roues', subcategory: 'Roues et pneus', category: categories[0]._id },
+    { id: 52, name: 'Contrôle de jantes (voilage)', subcategory: 'Roues et pneus', category: categories[0]._id },
+    { id: 53, name: 'Remplacement de jantes', subcategory: 'Roues et pneus', category: categories[0]._id },
+    { id: 54, name: 'Permutation des roues', subcategory: 'Roues et pneus', category: categories[0]._id },
+    { id: 55, name: 'Réparation de pneu crevé', subcategory: 'Roues et pneus', category: categories[0]._id },
+    { id: 56, name: 'Serrage au couple des écrous de roue', subcategory: 'Roues et pneus', category: categories[5]._id },
+    { id: 57, name: 'Remplacement de disques de frein', subcategory: 'Freinage (lié au train roulant)', category: categories[4]._id },
+    { id: 58, name: 'Remplacement de plaquettes de frein', subcategory: 'Freinage (lié au train roulant)', category: categories[4]._id },
+    { id: 59, name: 'Remplacement d’étriers de frein', subcategory: 'Freinage (lié au train roulant)', category: categories[4]._id },
+    { id: 60, name: 'Purge du circuit de freinage', subcategory: 'Freinage (lié au train roulant)', category: categories[4]._id },
+    { id: 61, name: 'Remplacement des flexibles de frein', subcategory: 'Freinage (lié au train roulant)', category: categories[4]._id },
+    { id: 62, name: 'Remplacement du maître-cylindre', subcategory: 'Freinage (lié au train roulant)', category: categories[4]._id },
+    { id: 63, name: 'Remplacement des garnitures de frein (freins tambours)', subcategory: 'Freinage (lié au train roulant)', category: categories[4]._id },
+  { id: 64, name: 'Remplacement de câble de frein à main', subcategory: 'Freinage (lié au train roulant)', category: categories[4]._id },
+  { id: 65, name: 'Contrôle et réglage du frein à main', subcategory: 'Freinage (lié au train roulant)', category: categories[4]._id },
+  { id: 66, name: 'Remplacement d’ampoules', subcategory: 'Éclairage', category: categories[1]._id },
+  { id: 67, name: 'Remplacement d’optiques (phares)', subcategory: 'Éclairage', category: categories[1]._id },
+  { id: 68, name: 'Réglage des phares', subcategory: 'Éclairage', category: categories[1]._id },
+  { id: 69, name: 'Remplacement de feux arrière', subcategory: 'Éclairage', category: categories[1]._id },
+  { id: 70, name: 'Remplacement de clignotants', subcategory: 'Éclairage', category: categories[1]._id },
+  { id: 71, name: 'Changement de batterie', subcategory: 'Démarrage et charge', category: categories[1]._id },
+  { id: 72, name: 'Contrôle et remplacement de l’alternateur', subcategory: 'Démarrage et charge', category: categories[1]._id },
+  { id: 73, name: 'Contrôle et remplacement du démarreur', subcategory: 'Démarrage et charge', category: categories[1]._id },
+  { id: 74, name: 'Remplacement de bougies (allumage)', subcategory: 'Allumage et gestion moteur', category: categories[1]._id },
+  { id: 75, name: 'Remplacement de bobines d’allumage', subcategory: 'Allumage et gestion moteur', category: categories[1]._id },
+  { id: 76, name: 'Contrôle de capteurs (PMH, température, etc.)', subcategory: 'Allumage et gestion moteur', category: categories[2]._id },
+  { id: 77, name: 'Diagnostic électronique', subcategory: 'Allumage et gestion moteur', category: categories[2]._id },
+  { id: 78, name: 'Remplacement de capteurs (débitmètre, lambda, etc.)', subcategory: 'Allumage et gestion moteur', category: categories[2]._id },
+  { id: 79, name: 'Contrôle des pressions (huile, turbo)', subcategory: 'Contrôles spécifiques', category: categories[2]._id },
+  { id: 80, name: 'Contrôle des compressions moteur', subcategory: 'Contrôles spécifiques', category: categories[0]._id },
+  { id: 81, name: 'Contrôle des jeux mécaniques', subcategory: 'Contrôles spécifiques', category: categories[0]._id },
+  { id: 82, name: 'Remplacement de joints divers (cache culbuteurs, carter, etc.)', subcategory: 'Étanchéité et joints', category: categories[0]._id },
+  { id: 83, name: 'Recherche et réparation de fuites d’huile', subcategory: 'Étanchéité et joints', category: categories[0]._id },
+  { id: 84, name: 'Recherche et réparation de fuites de liquide de refroidissement', subcategory: 'Étanchéité et joints', category: categories[0]._id },
+  { id: 85, name: 'Remplacement du joint spi vilebrequin', subcategory: 'Étanchéité et joints', category: categories[0]._id },
+  { id: 86, name: 'Remplacement du joint spi arbre à cames', subcategory: 'Étanchéité et joints', category: categories[0]._id },
+  { id: 87, name: 'Vidange moteur', subcategory: 'Entretien courant', category: categories[0]._id },
+  { id: 88, name: 'Remplacement de filtre à huile', subcategory: 'Entretien courant', category: categories[0]._id },
+  { id: 89, name: 'Remplacement de filtre à air', subcategory: 'Entretien courant', category: categories[0]._id },
+  { id: 90, name: 'Remplacement de filtre habitacle', subcategory: 'Entretien courant', category: categories[0]._id },
+  { id: 91, name: 'Remplacement de liquide de refroidissement', subcategory: 'Entretien courant', category: categories[0]._id },
+  { id: 92, name: 'Purge et remplacement du liquide de freins', subcategory: 'Entretien courant', category: categories[4]._id },
+  { id: 93, name: 'Remplacement de liquide de direction assistée', subcategory: 'Entretien courant', category: categories[3]._id },
+  { id: 94, name: 'Remplacement de liquide de transmission (boîte auto)', subcategory: 'Entretien courant', category: categories[6]._id },
+  ];
+
+  return works;
+}
+
+module.exports = getWorks;
