@@ -7,7 +7,7 @@ const RepairPage = () => {
   //const [repairs, setRepairs] = useState([]);
   const [vehicle, setVehicle] = useState(null);
   const [works, setWorks] = useState([]);
-
+  const [repairs, setRepairs] = useState([]);
   const [formData, setFormData] = useState({
     vehicle: '',
     number: '',
@@ -115,7 +115,7 @@ const RepairPage = () => {
 
   useEffect(()=>{
     fetchVehicle()
-    fetchWorks
+    fetchWorks()
   },[id])
 
   return (
@@ -132,7 +132,7 @@ const RepairPage = () => {
       {repairs.map((repair) => (
         <div className="card mb-3" key={repair.id}>
           <div className="card-body">
-            <h5 className="card-title">🚗 {repair.vehicle} — {repair.number}</h5>
+            <h5 className="card-title"><i class="bi bi-car-front-fill"></i> {repair.vehicle} — {repair.number}</h5>
             <h6 className="card-subtitle text-muted">
               Du {repair.startDate} au {repair.endDate}
             </h6>
@@ -195,7 +195,7 @@ const RepairPage = () => {
               </div>
             </div>
             <div className="modal-footer">
-              <button type="submit" className="btn btn-success">💾 Enregistrer</button>
+              <button type="submit" className="btn btn-success"><i class="bi bi-floppy2"></i> Enregistrer</button>
               <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
             </div>
           </form>

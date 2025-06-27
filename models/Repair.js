@@ -11,6 +11,11 @@ const repairSchema = new mongoose.Schema({
     ref: 'Work',
     required: true
   }],
+  works: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Employee',
+    required: true
+  }],
   description: {
     type: String,
     trim: true

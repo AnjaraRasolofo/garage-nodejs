@@ -49,6 +49,18 @@ function Navbar() {
 
           <li className="nav-item dropdown">
             <a className="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+              Réparations
+            </a>
+            <ul className="dropdown-menu custom-dropdown">
+              <li><a className="dropdown-item" href="/repairs">Liste des véhicules en cours de réparation</a></li>
+              <li><a className="dropdown-item" href="/add-repairs">Ajouter des réparations sur un véhicule</a></li>
+              <li><a className="dropdown-item" href="/add-parts">Ajouter des pièces de rechanges sur un véhicule</a></li>
+              <li><a className="dropdown-item" href="/">Facturer des réparations</a></li>
+            </ul>
+          </li>
+
+          <li className="nav-item dropdown">
+            <a className="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
               Stocks
             </a>
             <ul className="dropdown-menu custom-dropdown">

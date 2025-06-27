@@ -18,7 +18,7 @@ const VehicleList = () => {
 
   const fetchVehicles = async (page = 1) => {
     try {
-      const res = await API.get('/vehicles', {
+      const res = await API.get('/vehicles/paginated', {
         params: {
             page,
             limit: 10,

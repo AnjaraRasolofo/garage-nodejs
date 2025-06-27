@@ -23,11 +23,9 @@ const EmployeeList = () => {
     fetchEmployees();
   }, []);
 
-  //if (loading) return <div className="text-center mt-5">Chargement en cours...</div>;
-
   return (
     <div className="container mt-4">
-      <h2 className="mb-4">Liste des employés</h2>
+      <h2 className="mb-4">Les employés</h2>
       <table className="table table-bordered table-striped">
         <thead className="thead-dark">
           <tr>

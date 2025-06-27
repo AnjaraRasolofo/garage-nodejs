@@ -2,7 +2,8 @@ const express = require('express');
 const router = express.Router();
 const vehicleCtrl = require('../controllers/VehicleController');
 
-router.get('/', vehicleCtrl.getVehiclesPaginated);
+router.get('/', vehicleCtrl.getAllVehicles);
+router.get('/paginate', vehicleCtrl.getVehiclesPaginated);
 router.get('/in-progress', vehicleCtrl.getVehicleInProgress);
 router.get('/:id', vehicleCtrl.getVehicleById);
 router.post('/', vehicleCtrl.createVehicle);

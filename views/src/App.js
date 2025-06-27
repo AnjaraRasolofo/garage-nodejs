@@ -11,8 +11,8 @@ import CustomerList from './components/customers/CustomerList';
 import CustomerForm from './components/customers/CustomerForm';
 import VehicleList from './components/vehicles/VehicleList';
 import VehicleForm from './components/vehicles/VehiculeForm';
-import VehicleRepairForm from './components/vehicles/VehicleRepairForm';
-import VehicleRepairList from './components/vehicles/VehicleRepairList';
+import RepairForm from './components/repairs/RepairForm';
+import RepairList from './components/repairs/RepairList';
 
 function App() {
   return (
@@ -33,9 +33,9 @@ function App() {
         <Route path="/vehicles" element={<VehicleList/>}/>
         <Route path="/add-vehicle" element={<VehicleForm/>}/>
         <Route path="/vehicles/:id" element={<VehicleForm/>}/>
-        <Route path="/add-repairs/:id" element={<VehicleRepairForm />}/>
-        <Route path="/repairs/:id" element={<VehicleRepairList />}/>
 
+        <Route path="/repairs" element={<RepairList />}/>
+        <Route path="/add-repairs" element={<RepairForm />}/>
 
         <Route path="/employees" element={<EmployeesList/>}/>
         <Route path="/add-employe" element={<EmployeesForm/>}/>

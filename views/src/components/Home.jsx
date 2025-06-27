@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Button, Form, Badge, ListGroup, Dropdown } from 'react-bootstrap';
+import { Link } from 'react-router-dom'; 
 import API from "../services/api";
 
 const Home = () => {
   const [employees, setEmployees] = useState([]);
   const [clients, setClients] = useState([]);
+  const [vehicles, setVehicles] = useState([]);
   const [searchClient, setSearchClient] = useState('');
   const [filteredClients, setFilteredClients] = useState([]);
   const [repFilter, setRepFilter] = useState('day');
@@ -18,6 +20,25 @@ const Home = () => {
         }
   };
 
+  const fetchCustomerSummaries = async () => {
+    try {
+      const res = await API.get('/customers/summary');
+      setClients(res.data);
+      //setFilteredClients(res.data);
+    } catch (err) {
+      console.error('Erreur chargement résumé clients :', err);
+    }
+  };
+
+  const fetchVehicles = async () => {
+        try {
+          const res = await API.get('/vehicles');
+          setVehicles(res.data);
+        } catch (err) {
+          console.error('Erreur lors du chargement des véhicules :', err);
+        }
+  };
+
   useEffect(() => {
     // Données mockées
     setEmployees([
@@ -26,36 +47,10 @@ const Home = () => {
       { id: 3, name: 'Charlie', role: 'Technicien', status: 'available', skills: ['diagnostic'] },
     ]);
 
-    fetchCustomers();
+    //fetchCustomers();
+    fetchCustomerSummaries();
+    fetchVehicles();
     
-    /*
-    const mockClients = [
-      {
-        id: 1,
-        name: 'Jean Martin',
-        email: 'jean@mail.com',
-        phone: '0611223344',
-        plate: 'AB-123-CD',
-        repairs: [
-          { status: 'in_progress', date: '2025-06-17' },
-          { status: 'done', date: '2025-06-10' },
-        ],
-        appointments: 2,
-        invoices: 1,
-      },
-      {
-        id: 2,
-        name: 'Claire Dubois',
-        email: 'claire@mail.com',
-        phone: '0622334455',
-        plate: 'EF-456-GH',
-        repairs: [{ status: 'done', date: '2025-06-15' }],
-        appointments: 0,
-        invoices: 0,
-      },
-    ];*/
-    //setClients(fetchCustomers);
-    //setFilteredClients(mockClients);
   }, []);
 
   // Gestion employés
@@ -135,8 +130,8 @@ const Home = () => {
                 ))}
               </ListGroup>
               <div>
-                <p>📊 Employés total : <strong>{totalCount}</strong></p>
-                <p>🌴 En congé : <strong className="text-danger">{onLeaveCount}</strong></p>
+                <p> Employés total : <strong>{totalCount}</strong></p>
+                <p> En congé : <strong className="text-danger">{onLeaveCount}</strong></p>
               </div>
             </Card.Body>
           </Card>
@@ -175,13 +170,16 @@ const Home = () => {
                 {filteredClients.map((client) => (
                   <ListGroup.Item key={client.id} action as={Link} to={`/repairs/${client.id}`}>
                     <strong>{client.name}</strong> — {client.name} <br />
-                    📞 {client.phone} • ✉️ {client.email} <br />
-                    🔧 Réparations en cours :{' '}
+                     {client.phone} •  {client.email} <br />
+                     Nombre de véhicules : <strong>{ client.vehiclesCount ? client.vehiclesCount : 0 }</strong>< br/>
+                     Réparations en cours :<strong>{ client.repairsInProgress ? client.repairsInProgress : 0 }</strong> <br />
+                     Factures impayées: <strong>{ client.unpaidInvoices ? client.unpaidInvoices : 0 } </strong>
                   </ListGroup.Item>
                 ))}
               </ListGroup>
               <div className="text-muted text-sm">
-                <p>📊 Total clients : {clients.length}</p>
+                <p> Total clients : { clients.length }</p>
+                <p> Total des véhicules : { vehicles.length }</p>
               </div>
             </Card.Body>
           </Card>

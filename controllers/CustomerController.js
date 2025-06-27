@@ -1,4 +1,7 @@
 const Customer = require('../models/Customer');
+const Vehicle = require('../models/Vehicle');
+const Repair = require('../models/Repair');
+const Invoice = require('../models/Invoice');
 
 // GET /api/customers
 exports.getAllCustomers = async (req, res) => {
@@ -8,6 +11,43 @@ exports.getAllCustomers = async (req, res) => {
     res.json(customers);
   } catch (err) {
     res.status(500).json({ error: 'Erreur serveur.' });
+  }
+};
+
+// GET /api/custoers/summary
+exports.getCustomerSummaries = async (req, res) => {
+  console.log('test');
+  try {
+    const customers = await Customer.find();
+
+    const summaries = await Promise.all(customers.map(async (client) => {
+      const vehicles = await Vehicle.find({ client: client._id });
+      const vehicleIds = vehicles.map(v => v._id);
+
+      const repairsInProgress = await Repair.countDocuments({
+        vehicle: { $in: vehicleIds },
+        status: 'in_progress'
+      });
+
+      const unpaidInvoices = await Invoice.countDocuments({
+        customer: client._id,
+        status: { $ne: 'paid' }
+      });
+
+      return {
+        _id: client._id,
+        name: client.lastname,
+        email: client.email,
+        phone: client.phone,
+        vehiclesCount: vehicles.length,
+        repairsInProgress,
+        unpaidInvoices
+      };
+    }));
+    res.json(summaries);
+  } catch (err) {
+    console.error('Erreur résumé clients :', err);
+    res.status(500).json({ message: 'Erreur serveur' });
   }
 };
 
