@@ -1,29 +1,23 @@
 // VehicleList
 
 import React, { useEffect, useState } from 'react';
-import { Table, Container, Form } from 'react-bootstrap';
+import { Button, Row, Col, Table, Container, Form } from 'react-bootstrap';
 import API from '../../services/api';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import './Vehicle.css';
 
 const VehicleList = () => {
   
   const [vehicles, setVehicles] = useState([]);
-  const [statusFilter, setStatusFilter] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
   const [page, setPage] = useState(1);
   const [limit] = useState(10);
   const [total, setTotal] = useState(0);
+  const navigate = useNavigate();
 
-  //console.log(statusFilter);
-
-  const fetchVehicles = async (page = 1) => {
+  const fetchVehicles = async () => {
     try {
-      const res = await API.get('/vehicles/paginated', {
-        params: {
-            page,
-            limit: 10,
-        },
-      });
+      const res = await API.get(`/vehicles?search=${searchTerm}&page=${page}`);
       setVehicles(res.data.vehicles);
       setTotal(res.data.total);
     } catch (err) {
@@ -48,37 +42,62 @@ const VehicleList = () => {
   };
 
   useEffect(() => {
-    if(statusFilter == 'in_progress')  fetchVehiclesInProgress();
-    else fetchVehicles();
+    fetchVehicles(page);
   }, [page, limit]);
 
   const handlePageChange = (newPage) => {
     if (newPage >= 1 && newPage <= totalPages) {
-      fetchVehicles(newPage);
       setPage(newPage);
     }
   };
 
+  const handleAddVehicle = () => {
+    navigate('/add-vehicle');
+  };
+
   const totalPages = Math.ceil(total / limit);
 
-  console.log(vehicles);
-  const filteredVehicles = statusFilter
-    ? vehicles.filter(v => v.status === statusFilter)
-    : vehicles;
+  const filteredVehicles = vehicles.filter(v => {
+    const client = `${v.customer?.lastname || ''} ${v.customer?.name || ''}`.toLowerCase();
+    const model = `${v.brand || ''} ${v.model || ''}`.toLowerCase();
+    const number = `${v.number || ''}`.toLowerCase();
+    const search = searchTerm.toLowerCase();
+
+    return (
+        client.includes(search) ||
+        model.includes(search) ||
+        number.includes(search)
+    );
+  });
 
   return (
     <div className="container mt-4">
-      <h2 className="mb-4">Liste des véhicules</h2>
+      <h2 className="mb-4">Véhicules enregistrés</h2>
       
-      <Form.Group className="mb-3" controlId="statusFilter">
-        <Form.Label>Filtrer par statut</Form.Label>
-        <Form.Select value={statusFilter} onChange={e => setStatusFilter(e.target.value)}>
-          <option value="">Tous</option>
-          <option value="in_progress">En cours</option>
-          <option value="completed">Terminé</option>
-          <option value="pending">En attente</option>
-        </Form.Select>
-      </Form.Group>
+      <Row className="align-items-center mb-3">
+        <Col xs="auto">
+          <Button variant="primary" onClick={handleAddVehicle}>
+            Nouveau véhicule
+          </Button>
+        </Col>
+        <Col>
+          <Form className="d-flex align-items-center">
+            <Form.Label htmlFor="searchTerm" className="me-2 mb-0">
+              <i class="bi bi-search"></i>
+            </Form.Label>
+            <Form.Control
+              id="searchTerm"
+              type="text"
+              placeholder="Par client, modèle, marque, immatriculation..."
+              value={searchTerm}
+              onChange={e => {
+                setSearchTerm(e.target.value);
+                setPage(1);
+              }}
+            />
+          </Form>
+        </Col>
+      </Row>
 
       <table className="table table-bordered table-striped">
         <thead className="thead-dark">

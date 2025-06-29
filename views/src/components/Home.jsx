@@ -8,6 +8,8 @@ const Home = () => {
   const [clients, setClients] = useState([]);
   const [vehicles, setVehicles] = useState([]);
   const [searchClient, setSearchClient] = useState('');
+  const [searchEmployee, setSearchEmployee] = useState('');
+  const [filteredEmployees, setFilteredEmployees] = useState([]);
   const [filteredClients, setFilteredClients] = useState([]);
   const [repFilter, setRepFilter] = useState('day');
 
@@ -15,6 +17,15 @@ const Home = () => {
         try {
           const res = await API.get('/customers');
           setClients(res.data);
+        } catch (err) {
+          console.error('Erreur lors du chargement des clients :', err);
+        }
+  };
+
+  const fetchEmployees = async () => {
+        try {
+          const res = await API.get('/employees');
+          setEmployees(res.data);
         } catch (err) {
           console.error('Erreur lors du chargement des clients :', err);
         }
@@ -41,12 +52,12 @@ const Home = () => {
 
   useEffect(() => {
     // Données mockées
-    setEmployees([
+    /*setEmployees([
       { id: 1, name: 'Alice', role: 'Mécanicienne', status: 'available', skills: ['freinage'] },
       { id: 2, name: 'Bob', role: 'Carrossier', status: 'on_leave', skills: ['peinture'] },
       { id: 3, name: 'Charlie', role: 'Technicien', status: 'available', skills: ['diagnostic'] },
-    ]);
-
+    ]);*/
+    fetchEmployees();
     //fetchCustomers();
     fetchCustomerSummaries();
     fetchVehicles();
@@ -73,6 +84,19 @@ const Home = () => {
       )
     );
   };
+
+  const handleEmployeeSearch = (e) => {
+    const val = e.target.value.toLowerCase();
+    setSearchEmployee(val);
+    setFilteredEmployees(
+      (employees || []).filter(
+        (c) =>
+          (c.name || '').toLowerCase().includes(val) ||
+          (c.lastName || '').toLowerCase().includes(val) ||
+          (c.function || '').toLowerCase().includes(val) 
+      )
+    );
+  }
 
   // Filtrage historique
   const filterRepairs = (client) => {
@@ -109,6 +133,8 @@ const Home = () => {
               <Form.Control
                 type="text"
                 placeholder="Rechercher par nom, poste ou compétence"
+                value={searchEmployee}
+                onChange={handleEmployeeSearch}
                 className="mb-3"
               />
               <div className="d-flex justify-content-between align-items-center mb-2">
@@ -118,10 +144,10 @@ const Home = () => {
                 </Button>
               </div>
               <ListGroup className="mb-3">
-                {employees.map((emp) => (
+                {filteredEmployees.map((emp) => (
                   <ListGroup.Item key={emp.id} className="d-flex justify-content-between">
                     <div>
-                      <strong>{emp.name}</strong> — {emp.role}
+                      <strong>{emp.name}</strong> — {emp.function}
                     </div>
                     <Button variant="link" size="sm">
                       Détails
@@ -168,7 +194,7 @@ const Home = () => {
               </Dropdown>
               <ListGroup className="mb-3">
                 {filteredClients.map((client) => (
-                  <ListGroup.Item key={client.id} action as={Link} to={`/repairs/${client.id}`}>
+                  <ListGroup.Item key={client._id} action as={Link} to={`/customer/${client._id}/vehicles`}>
                     <strong>{client.name}</strong> — {client.name} <br />
                      {client.phone} •  {client.email} <br />
                      Nombre de véhicules : <strong>{ client.vehiclesCount ? client.vehiclesCount : 0 }</strong>< br/>

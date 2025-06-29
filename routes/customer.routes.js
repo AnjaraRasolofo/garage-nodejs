@@ -4,6 +4,8 @@ const customerCtrl = require('../controllers/CustomerController');
 
 router.get('/', customerCtrl.getAllCustomers);
 router.get('/summary', customerCtrl.getCustomerSummaries);
+router.get('/paginated', customerCtrl.getCustomersPaginated);
+router.get('/:id/vehicles', customerCtrl.getCustomerVehicles);
 router.get('/:id', customerCtrl.getCustomerById);
 router.post('/', customerCtrl.createCustomer);
 router.put('/:id', customerCtrl.updateCustomer);

@@ -4,7 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 
 const CustomerForm = () => {
   const [form, setForm] = useState({
-    name: '',
+    firstname: '',
     lastname: '',
     email: '',
     phone: '',
@@ -29,11 +29,12 @@ const CustomerForm = () => {
   }, [id]);
 
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    setForm({ ...form, [e.target.firstname]: e.target.value });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log(form);
     try {
       if (id) {
         await API.put(`/customers/${id}`, form);
@@ -55,8 +56,8 @@ const CustomerForm = () => {
           <input
             type="text"
             className="form-control"
-            name="name"
-            value={form.name}
+            name="firstname"
+            value={form.firstname}
             onChange={handleChange}
             required
           />

@@ -14,6 +14,42 @@ exports.getAllCustomers = async (req, res) => {
   }
 };
 
+// GET /api/customers/paginated
+exports.getCustomersPaginated = async (req, res) => {
+  try {
+    const search = req.query.search || '';
+    const page = parseInt(req.query.page) || 1;     
+    const limit = parseInt(req.query.limit) || 10;   
+    const skip = (page - 1) * limit;
+
+    const query = {
+      $or: [
+        { lastname: { $regex: search, $options: 'i' } },
+        { type: { $regex: search, $options: 'i' } }
+      ]
+    };
+
+    const customers = await Customer.find(query)
+      .skip(skip)
+      .limit(limit)
+      .sort({ createdAt: -1 });
+
+    const total = await Customer.countDocuments(query);
+    //console.log(customers);
+    res.json({
+      customers: customers,
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit)
+    });
+  }
+  catch(err) {
+    console.error('Erreur récuperation de clients par page', err);
+    res.status(500).json({ error: 'Erreur serveur.' });
+  }
+}
+
 // GET /api/custoers/summary
 exports.getCustomerSummaries = async (req, res) => {
   console.log('test');
@@ -51,6 +87,20 @@ exports.getCustomerSummaries = async (req, res) => {
   }
 };
 
+exports.getCustomerVehicles = async (req, res) => {
+  try {
+    const customer = await Customer.findById(req.params.id);
+    if (!customer) return res.status(404).json({ message: 'Client non trouvé' });
+    const vehicles = await Vehicle.find({customer : customer._id});
+
+    res.json({ customer, vehicles });
+  }
+  catch(error) {
+    console.error("Erreur lors du chargement des véhicules par client", error);
+    res.status(500).json({essage: "Ereur srveur"});
+  }
+}
+
 // GET /api/customers/:id
 exports.getCustomerById = async (req, res) => {
   try {
@@ -66,8 +116,8 @@ exports.getCustomerById = async (req, res) => {
 // POST /api/customers
 exports.createCustomer = async (req, res) => {
   try {
-    const customer = new Customer(req.body);
     console.log(req.body);
+    const customer = new Customer(req.body);
     await customer.save();
     console.log("Customer created");
     res.status(201).json(customer);

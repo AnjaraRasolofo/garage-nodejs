@@ -13,6 +13,7 @@ import VehicleList from './components/vehicles/VehicleList';
 import VehicleForm from './components/vehicles/VehiculeForm';
 import RepairForm from './components/repairs/RepairForm';
 import RepairList from './components/repairs/RepairList';
+import CustomerVehicles from './components/customers/CustomerVehiclesList';
 
 function App() {
   return (
@@ -29,6 +30,7 @@ function App() {
         <Route path="/customers" element={<CustomerList/>}/>
         <Route path="/add-customer" element={<CustomerForm/>}/>
         <Route path="/customers/:id" element={<CustomerForm/>}/>
+        <Route path="/customer/:id/vehicles" element={<CustomerVehicles />}/>
 
         <Route path="/vehicles" element={<VehicleList/>}/>
         <Route path="/add-vehicle" element={<VehicleForm/>}/>
@@ -42,6 +44,9 @@ function App() {
         <Route path="/employees/:id" element={<EmployeesList/>}/>
 
       </Routes>
+      <footer className="bg-light text-center py-3 mt-5">
+        &copy; 2023 - <a href="https://301-webagency.xyz" className="text-decoration-none text-reset">301 Web Agency </a>
+      </footer>
     </BrowserRouter>
   );
 }

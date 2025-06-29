@@ -23,21 +23,40 @@ exports.getVehicleById = async (req, res) => {
   }
 };
 
+// GET /api/vehicles/paginated
 exports.getVehiclesPaginated = async (req, res) => {
   try {
-    const page = parseInt(req.query.page) || 1;      // Page actuelle
-    const limit = parseInt(req.query.limit) || 10;   // Nombre par page
+    const search = req.query.search || '';
+    const page = parseInt(req.query.page) || 1;      
+    const limit = parseInt(req.query.limit) || 10;   
     const skip = (page - 1) * limit;
 
-    const [vehicles, total] = await Promise.all([
-      Vehicle.find()
+    const matchingCustomers = await Customer.find({
+      $or: [
+        { firstname: { $regex: search, $options: 'i' } },
+        { lastname: { $regex: search, $options: 'i' } }
+      ]
+    }).select('_id');
+
+    const customerIds = matchingCustomers.map(c => c._id);
+
+    const query = {
+      $or: [
+        { number: { $regex: search, $options: 'i' } },
+        { brand: { $regex: search, $options: 'i' } },
+        { model: { $regex: search, $options: 'i' } },
+        { customer: { $in: customerIds } }
+      ]
+    };
+
+    const vehicles = await Vehicle.find(query)
         .populate('customer')
         .skip(skip)
         .limit(limit)
-        .sort({ createdAt: -1 }), // optionnel
-      Vehicle.countDocuments()
-    ]);
-    //console.log(vehicles);
+        .sort({ createdAt: -1 }); 
+    
+    const total = await Vehicle.countDocuments(query);
+
     res.json({
       vehicles: vehicles,
       total,
@@ -51,6 +70,7 @@ exports.getVehiclesPaginated = async (req, res) => {
   }
 }
 
+// GET /api/vehicles/in-progress
 exports.getVehicleInProgress = async (req, res) => {
   try {
     // Trouver les réparations en cours
