@@ -18,6 +18,7 @@ exports.createRepair = async (req, res) => {
     await repair.save();
     res.status(201).json(repair);
   } catch (error) {
+    console.error("Erreur lors de création d'un nouveau travail de réparation", error);
     res.status(500).json({ error: error.message });
   }
 }
@@ -26,12 +27,24 @@ exports.getAllRepairs =  async (req, res) => {
   try {
     const repairs = await Repair.find()
       .populate('vehicle')
-      .populate('works');
+      .populate('customer');
     res.json(repairs);
   } catch (error) {
+    console.error("Erreur lors du chargement des réparations" + error);
     res.status(500).json({ error: error.message });
   }
 }
+
+exports.getRepairsByVehicle = async (req, res) => {
+  try {
+    const repairs = await Repair.find({ vehicle: req.params.id })
+      .populate('vehicle')
+      .populate('customer');
+    res.json(repairs);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
 
 exports.getRepairById = async (req, res) => {
   try {

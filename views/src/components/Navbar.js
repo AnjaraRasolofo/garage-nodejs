@@ -1,8 +1,19 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+
 import './Navbar.css';
 
 function Navbar() {
+  
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    navigate("/");
+  };
+
+  const token = localStorage.getItem("token");
+
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-dark px-4">
       <a className="navbar-brand" href="/">Garage Manager</a>
@@ -21,19 +32,13 @@ function Navbar() {
       <div className="collapse navbar-collapse" id="navbarNavDropdown">
         <ul className="navbar-nav">
 
-          <li className="nav-item">
-            <a className="nav-link active" href="/">Accueil</a>
-          </li>
-
-          
-
           <li className="nav-item dropdown">
             <a className="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
               Clients
             </a>
             <ul className="dropdown-menu custom-dropdown">
               <li><a className="dropdown-item" href="/customers">Liste des clients</a></li>
-              <li><a className="dropdown-item" href="/add-customer">Ajouter un client</a></li>
+              <li><a className="dropdown-item" href="/customers/add">Ajouter un client</a></li>
             </ul>
           </li>
 
@@ -43,7 +48,7 @@ function Navbar() {
             </a>
             <ul className="dropdown-menu custom-dropdown">
               <li><a className="dropdown-item" href="/vehicles">Liste des véhicules</a></li>
-              <li><a className="dropdown-item" href="/add-vehicle">Ajouter un véhicule</a></li>
+              <li><a className="dropdown-item" href="/vehicles/add">Ajouter un véhicule</a></li>
             </ul>
           </li>
 
@@ -53,8 +58,7 @@ function Navbar() {
             </a>
             <ul className="dropdown-menu custom-dropdown">
               <li><a className="dropdown-item" href="/repairs">Liste des véhicules en cours de réparation</a></li>
-              <li><a className="dropdown-item" href="/add-repairs">Ajouter des réparations sur un véhicule</a></li>
-              <li><a className="dropdown-item" href="/add-parts">Ajouter des pièces de rechanges sur un véhicule</a></li>
+              <li><a className="dropdown-item" href="/repairs/add">Ajouter des réparations sur un véhicule</a></li>
               <li><a className="dropdown-item" href="/">Facturer des réparations</a></li>
             </ul>
           </li>
@@ -65,9 +69,10 @@ function Navbar() {
             </a>
             <ul className="dropdown-menu custom-dropdown">
               <li><a className="dropdown-item" href="/parts">Liste des pièces détachées</a></li>
-              <li><a className="dropdown-item" href="/add-part">Ajouter des pièces détachées</a></li>
-              <li><a className="dropdown-item" href="/stock-in">Ajouter dans le stock</a></li>
-              <li><a className="dropdown-item" href="/stock-out">Sorties des pièces</a></li>
+              <li><a className="dropdown-item" href="/parts/add">Ajouter des pièces détachées</a></li>
+              <li><a className="dropdown-item" href="/stock">Mouvements des pièces</a></li>
+              <li><a className="dropdown-item" href="/stock/in-out">Ajouter / Retier dans le stock</a></li>
+              
             </ul>
           </li>
 
@@ -77,14 +82,32 @@ function Navbar() {
             </a>
             <ul className="dropdown-menu custom-dropdown">
               <li><a className="dropdown-item" href="/employees">Liste des employés</a></li>
-              <li><a className="dropdown-item" href="/add-employe">Ajouter un employé</a></li>
+              <li><a className="dropdown-item" href="/employees/add">Ajouter un employé</a></li>
             </ul>
           </li>
-
           <li className="nav-item">
             <a className="nav-link" href="/parametres">Paramètres</a>
-          </li>
+            <ul className="dropdown-menu custom-dropdown">
+              <li><a className="dropdown-item" href="/employees">Liste des employés</a></li>
+              <li><a className="dropdown-item" href="/employees/add">Ajouter un employé</a></li>
+            </ul>
+          </li> 
 
+          {/* lien logout uniquement si connecté */}
+          {token && (
+          <li className="nav-item">
+            <button
+              onClick={handleLogout}
+              className="nav-link btn btn-link"
+              style={{
+                border: "none",
+                background: "none",
+                cursor: "pointer"
+              }}
+            >
+              Déconnexion
+            </button>
+          </li>)}
         </ul>
       </div>
     </nav>

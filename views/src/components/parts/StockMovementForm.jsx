@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Form, Button, Alert, Spinner } from 'react-bootstrap';
+import { useNavigate, useParams } from 'react-router-dom';
 import API from '../../services/api';
 
 const StockMovementForm = () => {
@@ -10,6 +11,7 @@ const StockMovementForm = () => {
   const [type, setType] = useState('IN');
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchParts = async () => {
@@ -28,7 +30,7 @@ const StockMovementForm = () => {
     setLoading(true);
     setMessage('');
     try {
-      const endpoint = type === 'IN' ? '/parts/in' : '/parts/out';
+      const endpoint = type === 'IN' ? '/stock/in' : '/stock/out';
       const res = await API.post(endpoint, {
         partId,
         quantity: Number(quantity),
@@ -47,7 +49,9 @@ const StockMovementForm = () => {
 
   return (
     <div className="container mt-4">
-      <h4>Mouvement de stock</h4>
+      <h2 className="mb-4 text-end border-bottom pb-2">
+          Mouvement de stock
+      </h2>
       {message && <Alert variant="info">{message}</Alert>}
       <Form onSubmit={handleSubmit}>
         <Form.Group className="mb-3">
@@ -55,7 +59,7 @@ const StockMovementForm = () => {
           <Form.Select value={partId} onChange={(e) => setPartId(e.target.value)} required>
             <option value="">-- Sélectionner une pièce --</option>
             {parts.map((p) => (
-              <option key={p._id} value={p._id}>
+              <option key={p.id} value={p.id}>
                 {p.name} (Stock: {p.quantity})
               </option>
             ))}
@@ -93,6 +97,13 @@ const StockMovementForm = () => {
         <Button variant="primary" type="submit" disabled={loading}>
           {loading ? <Spinner animation="border" size="sm" /> : 'Valider'}
         </Button>
+        <button
+              type="button"
+              className="btn btn-secondary mx-2"
+              onClick={() => navigate('/parts')}
+            >
+              Annuler
+        </button>
       </Form>
     </div>
   );

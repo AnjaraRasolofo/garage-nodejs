@@ -22,7 +22,7 @@ mongoose.connect('mongodb://localhost:27017/garagedb', {
   console.log('✅ Connecté à MongoDB');
 
   mongoose.connection.dropDatabase(); // Réinitialise les collections
-
+/*
   try {
     await Category.deleteMany();
     await Category.insertMany(categories);
@@ -31,7 +31,7 @@ mongoose.connect('mongodb://localhost:27017/garagedb', {
   catch (error) {
     console.error('❌ Erreur lors de l’insertion des catégories :', error);
   }
-
+/*
   try{
     const works = await getWorks();
     await Work.deleteMany();
@@ -50,7 +50,7 @@ mongoose.connect('mongodb://localhost:27017/garagedb', {
   catch (error) {
     console.error('❌ Erreur lors de l’insertion des employés :', error);
   }
-  
+  */
   try {
     await Customer.deleteMany();
     await Customer.insertMany(customers);
@@ -59,7 +59,7 @@ mongoose.connect('mongodb://localhost:27017/garagedb', {
   catch (error) {
     console.error('❌ Erreur lors de l’insertion des clients :', error);
   }
-
+/*
   try {
     const vehicles = await getVehicle();
     await Vehicle.deleteMany();
@@ -78,7 +78,7 @@ mongoose.connect('mongodb://localhost:27017/garagedb', {
   } 
   catch (error) {
     console.error('❌ Erreur lors de l’insertion des pièces :', error);
-  }
+  }*/
 
   console.log('Données initiales insérées avec succès');
   mongoose.disconnect();

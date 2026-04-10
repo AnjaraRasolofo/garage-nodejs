@@ -30,6 +30,7 @@ const VehicleForm = () => {
 
   const fetchVehicle = async () => {
     try {
+      if (!id) return; //
       const res = await API.get(`/vehicles/${id}`);
       setVehicle(res.data); 
       setVehicleData({
@@ -38,7 +39,7 @@ const VehicleForm = () => {
           number: res.data.number || '',
           year: res.data.year || '',
           color: res.data.color || '',
-          customerId: res.data.customerId?._id || '',
+          customerId: res.data.customer?.id || '',
         });
     } catch (err) {
       console.error('Erreur lors du chardement de l\'info du véhicule :', err);
@@ -48,7 +49,7 @@ const VehicleForm = () => {
   useEffect(() => {
     const fetchCustomers = async () => {
       try {
-        const res = await API.get('/customers');
+        const res = await API.get('/customers/list');
         setCustomers(res.data);
       } catch (error) {
         console.error('Erreur lors du chargement des clients', error);
@@ -74,13 +75,22 @@ const VehicleForm = () => {
 
       if (newClient) {
         const res = await API.post('/customers', clientData);
-        customerId = res.data._id;
+        customerId = res.data.id;
       }
 
-      await API.post('/vehicles', {
-        ...vehicleData,
-        customerId,
-      });
+      if (id) {
+        await API.put(`/vehicles/${id}`, {
+          ...vehicleData,
+          year: Number(vehicleData.year),
+          customerId,
+        });
+      } else {
+        await API.post('/vehicles', {
+          ...vehicleData,
+          year: Number(vehicleData.year),
+          customerId,
+        });
+      }
 
       alert('Véhicule ajouté avec succès !');
       navigate('/vehicles');
@@ -92,7 +102,10 @@ const VehicleForm = () => {
 
   return (
     <Container className="mt-4">
-      <h2>{id ? 'Modifier un véhicule' : 'Ajouter un véhicule'}</h2>
+      <div className="card shadow p-4">
+      <h2 className="mb-4 text-end border-bottom pb-2">
+          {id ? 'Modifier un véhicule' : 'Ajouter un véhicule'}
+      </h2>
       <Form onSubmit={handleSubmit}>
 
         {/* Toggle nouveau client */}
@@ -159,9 +172,9 @@ const VehicleForm = () => {
               required
             >
               <option value="">Sélectionner un client</option>
-              {customers.map((c) => (
-                <option key={c._id} value={c._id}>
-                  {c.lastname} {c.firstname}
+              {Array.isArray(customers) && customers.map(c => (
+                <option key={c.id} value={c.id}>
+                  {c.name}
                 </option>
               ))}
             </Form.Select>
@@ -171,31 +184,54 @@ const VehicleForm = () => {
         {/* Véhicule */}
         <h4>Véhicule:</h4>
         <Row>
-          <Col md={4}>
+          <Col md={3}>
             <Form.Group className="mb-3">
               <Form.Label>Marque</Form.Label>
               <Form.Control name="brand" value={vehicleData.brand} onChange={handleVehicleChange} required />
             </Form.Group>
           </Col>
-          <Col md={4}>
+          <Col md={3}>
             <Form.Group className="mb-3">
               <Form.Label>Modèle</Form.Label>
               <Form.Control name="model" value={vehicleData.model} onChange={handleVehicleChange} required />
             </Form.Group>
           </Col>
-          <Col md={4}>
+          <Col md={3}>
             <Form.Group className="mb-3">
               <Form.Label>Immatriculation</Form.Label>
               <Form.Control name="number" value={vehicleData.number} onChange={handleVehicleChange} required />
             </Form.Group>
           </Col>
+          <Col md={3}>
+            <Form.Group className="mb-3">
+              <Form.Label>Année</Form.Label>
+              <Form.Control
+                type="number"
+                name="year"
+                value={vehicleData.year}
+                onChange={handleVehicleChange}
+                required
+                min="1900"
+                max={new Date().getFullYear()}
+              />
+            </Form.Group>
+          </Col>
         </Row>
 
-        <Button type="submit" variant="primary">
+        <Button type="submi</div>t" variant="primary">
           {id ? 'Mettre à jour le véhicule' : 'Ajouter le véhicule'}
         </Button>
+        <button
+              type="button"
+              className="btn btn-secondary mx-2"
+              onClick={() => navigate('/vehicles')}
+            >
+              Annuler
+          </button>
       </Form>
+      </div>
     </Container>
+    
   );
 };
 

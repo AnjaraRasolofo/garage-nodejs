@@ -29,12 +29,12 @@ const CustomerForm = () => {
   }, [id]);
 
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.firstname]: e.target.value });
+    setForm({ ...form, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(form);
+    //console.log(form);
     try {
       if (id) {
         await API.put(`/customers/${id}`, form);
@@ -49,7 +49,11 @@ const CustomerForm = () => {
 
   return (
     <div className="container mt-4">
-      <h4>{id ? "Modifier un client" : "Ajouter un client"}</h4>
+      <div className="card shadow p-4">
+      <h2 classname='mb-3 text-end border-bottom mb-2'>
+        {id ? "Modifier un client" : "Ajouter un client"}
+      </h2>
+      
       <form onSubmit={handleSubmit} className="row g-3">
         <div className="col-md-6">
           <label className="form-label">Prénom</label>
@@ -112,15 +116,23 @@ const CustomerForm = () => {
             onChange={handleChange}
           >
             <option value="particulier">Particulier</option>
-            <option value="professionnel">Professionnel</option>
+            <option value="company">Professionnel</option>
           </select>
         </div>
         <div className="col-12">
           <button type="submit" className="btn btn-primary">
             {id ? "Mettre à jour" : "Ajouter"}
           </button>
+          <button
+              type="button"
+              className="btn btn-secondary mx-2"
+              onClick={() => navigate('/customers')}
+            >
+              Annuler
+          </button>
         </div>
       </form>
+      </div>
     </div>
   );
 };

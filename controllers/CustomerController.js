@@ -10,6 +10,7 @@ exports.getAllCustomers = async (req, res) => {
     console.log("all customers charged")
     res.json(customers);
   } catch (err) {
+    console.error("Erreur lors du chargement des clients" + err);
     res.status(500).json({ error: 'Erreur serveur.' });
   }
 };
@@ -45,7 +46,7 @@ exports.getCustomersPaginated = async (req, res) => {
     });
   }
   catch(err) {
-    console.error('Erreur récuperation de clients par page', err);
+    console.error('Erreur lors du récuperation des clients par page', err);
     res.status(500).json({ error: 'Erreur serveur.' });
   }
 }
@@ -87,6 +88,7 @@ exports.getCustomerSummaries = async (req, res) => {
   }
 };
 
+// GET api/customers/:id/vehicles
 exports.getCustomerVehicles = async (req, res) => {
   try {
     const customer = await Customer.findById(req.params.id);
@@ -97,7 +99,7 @@ exports.getCustomerVehicles = async (req, res) => {
   }
   catch(error) {
     console.error("Erreur lors du chargement des véhicules par client", error);
-    res.status(500).json({essage: "Ereur srveur"});
+    res.status(500).json({message: "Erreur serveur"});
   }
 }
 

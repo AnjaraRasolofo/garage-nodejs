@@ -4,37 +4,48 @@ import { Link } from 'react-router-dom';
 import API from "../services/api";
 
 const Home = () => {
+  const token = localStorage.getItem("token");
   const [employees, setEmployees] = useState([]);
-  const [clients, setClients] = useState([]);
+  const [customers, setCustomers] = useState([]);
+  //const [clients, setClients] = useState([]);
   const [vehicles, setVehicles] = useState([]);
-  const [searchClient, setSearchClient] = useState('');
+  const [searchCustomers, setSearchCustomers] = useState('');
+  const [searchInvoices, setSearchInvoices] = useState('');
   const [searchEmployee, setSearchEmployee] = useState('');
   const [filteredEmployees, setFilteredEmployees] = useState([]);
-  const [filteredClients, setFilteredClients] = useState([]);
+  const [filteredCustomers, setFilteredCustomers] = useState([]);
   const [repFilter, setRepFilter] = useState('day');
+  const [stockStats, setStockStats] = useState({});
+  const [invoiceStats, setInvoiceStats] = useState({});
 
   const fetchCustomers = async () => {
         try {
           const res = await API.get('/customers');
-          setClients(res.data);
+          setCustomers(res.data);
         } catch (err) {
-          console.error('Erreur lors du chargement des clients :', err);
+          if (err.response?.status === 404) console.error("Erreur lors du chargement des clients"); 
+          else console.error("Erreur API :", err);
+          setCustomers([]); // fallback propre
         }
   };
 
   const fetchEmployees = async () => {
-        try {
-          const res = await API.get('/employees');
-          setEmployees(res.data);
-        } catch (err) {
-          console.error('Erreur lors du chargement des clients :', err);
-        }
+    try {
+      const res = await API.get('/employees');
+      setEmployees(res?.data ?? []);
+    } 
+    catch (err) {
+      if (err.response?.status === 404) {
+        console.error("Erreur lors du chargement des clients");
+      } else console.error("Erreur API :", err);
+      setEmployees([]); // fallback propre
+    }
   };
 
   const fetchCustomerSummaries = async () => {
     try {
       const res = await API.get('/customers/summary');
-      setClients(res.data);
+      setCustomers(res.data);
       //setFilteredClients(res.data);
     } catch (err) {
       console.error('Erreur chargement résumé clients :', err);
@@ -50,17 +61,32 @@ const Home = () => {
         }
   };
 
+  const fetchStockStats = async () => {
+    try {
+      const res = await API.get('/stock/stats');
+      setStockStats(res.data);
+    } catch (err) {
+      console.error("Erreur stock :", err);
+    }
+  };
+
+  const fetchInvoiceStats = async () => {
+    try {
+      const res = await API.get('/invoices/stats');
+      setInvoiceStats(res.data);
+    } catch (err) {
+      console.error("Erreur factures :", err);
+    }
+  };
+
   useEffect(() => {
-    // Données mockées
-    /*setEmployees([
-      { id: 1, name: 'Alice', role: 'Mécanicienne', status: 'available', skills: ['freinage'] },
-      { id: 2, name: 'Bob', role: 'Carrossier', status: 'on_leave', skills: ['peinture'] },
-      { id: 3, name: 'Charlie', role: 'Technicien', status: 'available', skills: ['diagnostic'] },
-    ]);*/
+    
     fetchEmployees();
-    //fetchCustomers();
-    fetchCustomerSummaries();
-    fetchVehicles();
+    fetchCustomers();
+    fetchStockStats();   
+    fetchInvoiceStats(); 
+    //fetchCustomerSummaries();
+    //fetchVehicles();
     
   }, []);
 
@@ -69,15 +95,15 @@ const Home = () => {
   const availableCount = employees.filter(e => e.status === 'available').length;
   const onLeaveCount = employees.filter(e => e.status === 'on_leave').length;
 
-  console.log(clients);
+  //console.log(clients);
   // Recherche clients
-  const handleClientSearch = (e) => {
+  const handleCustomersSearch = (e) => {
   const val = e.target.value.toLowerCase();
-  setSearchClient(val);
-  setFilteredClients(
-      (clients || []).filter(
+  setSearchCustomers(val);
+  setFilteredCustomers(
+      (customers || []).filter(
         (c) =>
-          (c.name || '').toLowerCase().includes(val) ||
+          (c.firstname || '').toLowerCase().includes(val) ||
           (c.email || '').toLowerCase().includes(val) ||
           (c.plate || '').toLowerCase().includes(val) ||
           (c.phone || '').toLowerCase().includes(val)
@@ -85,13 +111,17 @@ const Home = () => {
     );
   };
 
+  const handleInvoicesSearch = (e) => {
+
+  }
+
   const handleEmployeeSearch = (e) => {
     const val = e.target.value.toLowerCase();
     setSearchEmployee(val);
     setFilteredEmployees(
       (employees || []).filter(
         (c) =>
-          (c.name || '').toLowerCase().includes(val) ||
+          (c.firstname || '').toLowerCase().includes(val) ||
           (c.lastName || '').toLowerCase().includes(val) ||
           (c.function || '').toLowerCase().includes(val) 
       )
@@ -99,9 +129,9 @@ const Home = () => {
   }
 
   // Filtrage historique
-  const filterRepairs = (client) => {
+  const filterRepairs = (customer) => {
     const today = new Date();
-    return client.repairs.filter(r => {
+    return customer.repairs.filter(r => {
       const date = new Date(r.date);
       if (repFilter === 'day') return date.toDateString() === today.toDateString();
       if (repFilter === 'week') {
@@ -147,7 +177,7 @@ const Home = () => {
                 {filteredEmployees.map((emp) => (
                   <ListGroup.Item key={emp.id} className="d-flex justify-content-between">
                     <div>
-                      <strong>{emp.name}</strong> — {emp.function}
+                      <strong>{emp.firstname} {emp.lastname}</strong> — {emp.function}
                     </div>
                     <Button variant="link" size="sm">
                       Détails
@@ -178,8 +208,8 @@ const Home = () => {
               <Form.Control
                 type="text"
                 placeholder="Rechercher par nom, immatriculation, téléphone ou email"
-                value={searchClient}
-                onChange={handleClientSearch}
+                value={searchCustomers}
+                onChange={handleCustomersSearch}
                 className="mb-3"
               />
               <Dropdown className="mb-2">
@@ -193,8 +223,8 @@ const Home = () => {
                 </Dropdown.Menu>
               </Dropdown>
               <ListGroup className="mb-3">
-                {filteredClients.map((client) => (
-                  <ListGroup.Item key={client._id} action as={Link} to={`/customer/${client._id}/vehicles`}>
+                {filteredCustomers.map((client) => (
+                  <ListGroup.Item key={client.id} action as={Link} to={`/customer/${client.id}/vehicles`}>
                     <strong>{client.name}</strong> — {client.name} <br />
                      {client.phone} •  {client.email} <br />
                      Nombre de véhicules : <strong>{ client.vehiclesCount ? client.vehiclesCount : 0 }</strong>< br/>
@@ -204,8 +234,66 @@ const Home = () => {
                 ))}
               </ListGroup>
               <div className="text-muted text-sm">
-                <p> Total clients : { clients.length }</p>
+                <p> Total clients : { customers.length }</p>
                 <p> Total des véhicules : { vehicles.length }</p>
+              </div>
+            </Card.Body>
+          </Card>
+        </Col>
+
+
+
+        {/* Gestion des pièces détachées */}
+        <Col md={6}>
+          <Card className="mb-3 shadow-sm">
+            <Card.Body>
+              <Card.Title>
+                Stock pièces détachées
+                <img 
+                  src="/images/piece-detachee.png" 
+                  alt="clients"
+                  style={{ width: '56px', height: '56px', marginLeft: '12px', objectFit: 'contain' }}
+                />
+              </Card.Title>
+              <Form.Control
+                type="text"
+                placeholder="Rechercher par designation"
+                value={searchInvoices}
+                onChange={handleInvoicesSearch}
+                className="mb-3"
+              />
+              <div className="text-muted text-sm">
+                <p> Total stock : {stockStats.totalParts || 0}</p>
+                <p> Faible quantité : {stockStats.lowStock || 0}</p>
+                <p> Rupture : <strong className="text-danger">{stockStats.outOfStock || 0}</strong></p>
+              </div>
+            </Card.Body>
+          </Card>
+        </Col>
+
+        {/* Stat des factures */}
+        <Col md={6}>
+          <Card className="mb-3 shadow-sm">
+            <Card.Body>
+              <Card.Title>
+                Factures
+                <img 
+                  src="/images/facture-dachat.png" 
+                  alt="clients"
+                  style={{ width: '56px', height: '56px', marginLeft: '12px', objectFit: 'contain' }}
+                />
+              </Card.Title>
+              <Form.Control
+                type="text"
+                placeholder="Rechercher par numéro de facture, nom du client ou immatriculation"
+                value={searchInvoices}
+                onChange={handleInvoicesSearch}
+                className="mb-3"
+              />
+              <div className="text-muted text-sm">
+                <p> Brouillons : <strong bg="secondary">{invoiceStats.draft || 0}</strong></p>
+                <p> Payées : <strong bg="success">{invoiceStats.paid || 0}</strong></p>
+                <p> Impayées : <strong bg="danger">{invoiceStats.unpaid || 0}</strong></p>
               </div>
             </Card.Body>
           </Card>

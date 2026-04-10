@@ -1,173 +1,174 @@
 import React, { useEffect, useState } from 'react';
+import { Row, Col, Form } from 'react-bootstrap';
 import API from '../../services/api';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
-const RepairList = () => {
-  const [repairs, setRepairs] = useState([]);
-  const [selectedVehicle, setSelectedVehicle] = useState('');
-  const [selectedStatus, setSelectedStatus] = useState('');
+function ReparationList() {
+  const [reparations, setReparations] = useState([]);
   const [loading, setLoading] = useState(true);
-
-  const [currentPage, setCurrentPage] = useState(1);
-  const repairsPerPage = 10;
+  const [searchTerm, setSearchTerm] = useState('');
+  const [page, setPage] = useState(1);
+  const [limit] = useState(10);
+  const [total, setTotal] = useState(0);
 
   const navigate = useNavigate();
 
-  const fetchRepairs = async () => {
-      try {
-        const response = await API.get('/repairs');
-        setRepairs(response.data);
-        setLoading(false);
-      } catch (err) {
-        console.error('Erreur chargement API:', err);
-      }
-    };
+  const fetchReparations = async (page = 1) => {
+    try {
+      setLoading(true);
+      const res = await API.get(
+        `/repairs?page=${page}&limit=${limit}&search=${searchTerm}`
+      );
+
+      setReparations(res.data.data);
+      setPage(res.data.pagination.page);
+      setTotal(res.data.pagination.total);
+    } catch (err) {
+      console.error('Erreur lors du chargement des réparations :', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const deleteReparation = async (id) => {
+    if (window.confirm('Supprimer cette réparation ?')) {
+      await API.delete(`/repairs/${id}`);
+      fetchReparations(page);
+    }
+  };
+
+  const totalPages = Math.ceil(total / limit);
+
+  const handlePageChange = (newPage) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      setPage(newPage);
+    }
+  };
 
   useEffect(() => {
-
-    fetchRepairs();
-  }, []);
-
-  const uniqueVehicles = [...new Map(
-    repairs.map(rep => [rep.vehicle._id, rep.vehicle])
-  ).values()];
-
-  const filteredRepairs = repairs.filter(repair => {
-    return (
-      (!selectedVehicle || repair.vehicle._id === selectedVehicle) &&
-      (!selectedStatus || repair.status === selectedStatus)
-    );
-  });
-
-  // code qui gère la pagination
-  const indexOfLastRepair = currentPage * repairsPerPage;
-  const indexOfFirstRepair = indexOfLastRepair - repairsPerPage;
-  const currentRepairs = filteredRepairs.slice(indexOfFirstRepair, indexOfLastRepair);
-  const totalPages = Math.ceil(filteredRepairs.length / repairsPerPage);
-
-  if (loading) return <div className="text-center mt-4">Chargement...</div>;
+    fetchReparations(page);
+  }, [page, limit, searchTerm]);
 
   return (
     <div className="container mt-4">
-      <h2 className="mb-4">Réparations des véhicules</h2>
-      <div className='mb-4'>
-        <button className="btn btn-primary" onClick={() => navigate('/add-repairs')}>
+      <h2>Liste des réparations</h2>
+
+      <Row className="align-items-center mb-3">
+        <Col xs="auto">
+          <Link to="/repairs/add" className="btn btn-primary mb-3">
             Ajouter une réparation
-          </button>
-      </div>
-      {/* Filtres */}
-      <div className="row mb-4">
-        <div className="col-md-6">
-          <label className="form-label">Véhicule</label>
-          <select
-            className="form-select"
-            value={selectedVehicle}
-            onChange={(e) => {
-              setSelectedVehicle(e.target.value);
-              setCurrentPage(1);
-            }}
-          >
-            <option value="">Tous</option>
-            {uniqueVehicles.map((v) => (
-              <option key={ v._id } value={ v._id }>
-                { v.number }  - { v.brand } { v.model }
-              </option>
-            ))}
-          </select>
-        </div>
+          </Link>
+        </Col>
 
-        <div className="col-md-4">
-          <label className="form-label">État</label>
-          <select
-            className="form-select"
-            value={selectedStatus}
-            onChange={(e) => {
-              setSelectedStatus(e.target.value);
-              setCurrentPage(1);
-            }}
-          >
-            <option value="">Tous</option>
-            <option value="pending">En attente</option>
-            <option value="in_progress">En cours</option>
-            <option value="completed">Terminée</option>
-            <option value="cancelled">Annulée</option>
-          </select>
-        </div>
+        <Col>
+          <Form className="d-flex align-items-center">
+            <Form.Label htmlFor="searchTerm" className="me-2 mb-0">
+              <i className="bi bi-search"></i>
+            </Form.Label>
+            <Form.Control
+              id="searchTerm"
+              type="text"
+              placeholder="Rechercher client, véhicule ou statut..."
+              value={searchTerm}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                setPage(1);
+              }}
+            />
+          </Form>
+        </Col>
+      </Row>
 
-        <div className="col-md-4">
-          <div></div>
-          
-        </div>
-
-      </div>
-
-      {/* Tableau */}
-      <div className="table-responsive">
-        <table className="table table-striped table-bordered align-middle">
-          <thead className="table-dark">
-            <tr>
-              <th>#</th>
-              <th>Véhicule</th>
-              <th>Description</th>
-              <th>État</th>
-              <th>Date de début</th>
-              <th>Date de fin</th>
-              <th>Coût (€)</th>
+      {/* TABLE */}
+      <table className="table table-bordered">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Client</th>
+            <th>Véhicule</th>
+            <th>Statut</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {reparations.map((r) => (
+            <tr key={r.id}>
+              <td>{r.date}</td>
+              <td>{r.customer?.name || '-'}</td>
+              <td>{r.vehicle?.number || '-'}</td>
+              <td>
+                <span className="badge bg-secondary">
+                  {r.status}
+                </span>
+              </td>
+              <td style={{ width: '120px' }}>
+                <div className="d-flex justify-content-center">
+                  <Link
+                    to={`/repairs/${r.id}`}
+                    className="btn btn-warning btn-sm me-2"
+                  >
+                    <i className="bi bi-pencil-square"></i>
+                  </Link>
+                  <button
+                    className="btn btn-danger btn-sm"
+                    onClick={() => deleteReparation(r.id)}
+                  >
+                    <i className="bi bi-trash"></i>
+                  </button>
+                </div>
+              </td>
             </tr>
-          </thead>
-          <tbody>
-            {currentRepairs.map((repair, index) => (
-              <tr key={repair._id}>
-                <td>{indexOfFirstRepair + index + 1}</td>
-                <td>{repair.vehicle.number || repair.vehicle._id}</td>
-                <td>{repair.description}</td>
-                <td>
-                  <span className={`badge ${
-                    repair.status === 'pending' ? 'bg-warning text-dark' :
-                    repair.status === 'in_progress' ? 'bg-info text-dark' :
-                    repair.status === 'completed' ? 'bg-success' :
-                    repair.status === 'cancelled' ? 'bg-danger' : 'bg-secondary'
-                  }`}>
-                    {repair.status.replace('_', ' ')}
-                  </span>
-                </td>
-                <td>{new Date(repair.startDate).toLocaleDateString()}</td>
-                <td>{repair.endDate ? new Date(repair.endDate).toLocaleDateString() : '—'}</td>
-                <td>{repair.cost}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+          ))}
+        </tbody>
+      </table>
 
-      {/* Pagination */}
-      {totalPages > 1 && (
-        <nav className="mt-4">
-          <ul className="pagination justify-content-center">
-            <li className={`page-item ${currentPage === 1 && 'disabled'}`}>
-              <button className="page-link" onClick={() => setCurrentPage(currentPage - 1)}>
-                Précédent
+      {/* LOADING */}
+      {loading && <p className="text-center">Chargement...</p>}
+
+      {/* PAGINATION */}
+      <nav>
+        <ul className="pagination justify-content-center">
+          <li className={`page-item ${page === 1 ? 'disabled' : ''}`}>
+            <button
+              className="page-link"
+              onClick={() => handlePageChange(page - 1)}
+              disabled={page === 1}
+            >
+              Précédent
+            </button>
+          </li>
+
+          {[...Array(totalPages || 0)].map((_, index) => (
+            <li
+              key={index}
+              className={`page-item ${page === index + 1 ? 'active' : ''}`}
+            >
+              <button
+                className="page-link"
+                onClick={() => handlePageChange(index + 1)}
+              >
+                {index + 1}
               </button>
             </li>
-            {Array.from({ length: totalPages }, (_, i) => (
-              <li key={i} className={`page-item ${currentPage === i + 1 && 'active'}`}>
-                <button className="page-link" onClick={() => setCurrentPage(i + 1)}>
-                  {i + 1}
-                </button>
-              </li>
-            ))}
-            <li className={`page-item ${currentPage === totalPages && 'disabled'}`}>
-              <button className="page-link" onClick={() => setCurrentPage(currentPage + 1)}>
-                Suivant
-              </button>
-            </li>
-          </ul>
-        </nav>
-      )}
+          ))}
 
+          <li
+            className={`page-item ${
+              page === totalPages ? 'disabled' : ''
+            }`}
+          >
+            <button
+              className="page-link"
+              onClick={() => handlePageChange(page + 1)}
+              disabled={page === totalPages}
+            >
+              Suivant
+            </button>
+          </li>
+        </ul>
+      </nav>
     </div>
   );
-};
+}
 
-export default RepairList;
-
+export default ReparationList;

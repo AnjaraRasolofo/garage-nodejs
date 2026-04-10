@@ -8,6 +8,8 @@ router.get('/', repairController.getAllRepairs);
 
 router.get('/:id', repairController.getRepairById);
 
+router.get('/vehicle/:id', repairController.getRepairsByVehicle);
+
 router.put('/:id', repairController.updateRepair);
 
 router.delete('/:id', repairController.deleteRepair);

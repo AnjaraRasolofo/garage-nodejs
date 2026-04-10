@@ -4,14 +4,15 @@ import { useNavigate, useParams } from 'react-router-dom';
 
 const EmployeForm = ({ onAdd }) => {
   const [form, setForm] = useState({
-    name: '',
-    lastName: '',
+    firstname: '',
+    lastname: '',
     email: '',
     phone: '',
-    adresse: '',
+    address: '',
     function: '',
-    hiring_date: '',
-    salary: ''
+    hiringDate: '',
+    salary: '',
+    status: ''
   });
 
   const navigate = useNavigate();
@@ -42,15 +43,18 @@ const EmployeForm = ({ onAdd }) => {
 
   return (
     <div className="container mt-4">
-      <h4>Ajouter un nouvel employé</h4>
+      <div className="card shadow p-4">
+      <h2 className="mb-4 text-end border-bottom pb-2">
+          {id ? 'Modifier un employé' : 'Ajouter un nouvel employé'}
+      </h2>
       <form onSubmit={handleSubmit} className="row g-3">
         <div className="col-md-6">
           <label className="form-label">Prénom</label>
-          <input type="text" className="form-control" name="name" value={form.name} onChange={handleChange} required />
+          <input type="text" className="form-control" name="firstname" value={form.firstname} onChange={handleChange} required />
         </div>
         <div className="col-md-6">
           <label className="form-label">Nom</label>
-          <input type="text" className="form-control" name="lastName" value={form.lastName} onChange={handleChange} required />
+          <input type="text" className="form-control" name="lastname" value={form.lastname} onChange={handleChange} required />
         </div>
         <div className="col-md-6">
           <label className="form-label">Email</label>
@@ -62,7 +66,7 @@ const EmployeForm = ({ onAdd }) => {
         </div>
         <div className="col-12">
           <label className="form-label">Adresse</label>
-          <input type="text" className="form-control" name="adresse" value={form.adresse} onChange={handleChange} />
+          <input type="text" className="form-control" name="address" value={form.address} onChange={handleChange} />
         </div>
         <div className="col-md-6">
           <label className="form-label">Poste</label>
@@ -70,7 +74,7 @@ const EmployeForm = ({ onAdd }) => {
         </div>
         <div className="col-md-3">
           <label className="form-label">Date embauche</label>
-          <input type="date" className="form-control" name="hiring_date" value={form.hiring_date} onChange={handleChange} />
+          <input type="date" className="form-control" name="hiringDate" value={form.hiringDate} onChange={handleChange} />
         </div>
         <div className="col-md-3">
           <label className="form-label">Salaire (Ar)</label>
@@ -78,8 +82,16 @@ const EmployeForm = ({ onAdd }) => {
         </div>
         <div className="col-12">
           <button type="submit" className="btn btn-primary">Ajouter</button>
+        <button
+              type="button"
+              className="btn btn-secondary mx-2"
+              onClick={() => navigate('/employees')}
+            >
+              Annuler
+        </button>
         </div>
       </form>
+      </div>
     </div>
   );
 };

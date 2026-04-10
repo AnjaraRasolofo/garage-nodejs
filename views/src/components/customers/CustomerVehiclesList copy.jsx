@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import API from '../../services/api';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, Link } from 'react-router-dom';
 import { Spinner, Card, ListGroup, Button } from 'react-bootstrap';
 
-const CustomerVehicles = () => {
+const CustomerVehiclesList = () => {
   const { id } = useParams(); // client ID from URL
   const [customer, setCustomer] = useState(null);
   const [vehicles, setVehicles] = useState([]);
@@ -41,6 +41,7 @@ const CustomerVehicles = () => {
       </Card>
 
       <h4>Véhicules</h4>
+      {vehicles.length > 0 ? (
       <ListGroup className="mb-3">
         {vehicles.map(vehicle => (
           <ListGroup.Item key={vehicle._id}>
@@ -48,6 +49,9 @@ const CustomerVehicles = () => {
           </ListGroup.Item>
         ))}
       </ListGroup>
+      ) : (
+        <p>Aucun véhicule enregistré pour ce client.</p>
+      )}
       
       <div className="d-flex">
         <Button variant="secondary" onClick={() => navigate(-1)} className="me-2">← Précédent</Button>
@@ -57,4 +61,4 @@ const CustomerVehicles = () => {
   );
 };
 
-export default CustomerVehicles;
+export default CustomerVehiclesList;
